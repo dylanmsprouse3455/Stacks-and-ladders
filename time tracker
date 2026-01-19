@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave Time Calculator</title>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    padding: 20px;
+    max-width: 420px;
+    margin: auto;
+  }
+  .step {
+    display: none;
+    margin-top: 20px;
+  }
+  .step.active {
+    display: block;
+  }
+  input, button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  button {
+    cursor: pointer;
+  }
+  .result {
+    font-size: 18px;
+    margin-top: 15px;
+    font-weight: bold;
+    line-height: 1.5;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>When Do I Need to Start?</h2>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <label>How long is the drive? (minutes)</label>
+  <input type="number" id="driveMinutes" min="0">
+  <button onclick="nextStep(2)">Next</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <label>What time do you need to be there?</label>
+  <input type="time" id="arrivalTime">
+  <button onclick="nextStep(3)">Next</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <label>Do you need a shower?</label>
+  <button onclick="calculate(false)">No</button>
+  <button onclick="calculate(true)">Yes</button>
+</div>
+
+<!-- RESULT -->
+<div class="step" id="resultStep">
+  <div class="result" id="output"></div>
+</div>
+
+<script>
+  function nextStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + step)?.classList.add('active');
+  }
+
+  function timeToMinutes(t) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  function minutesTo12Hour(mins) {
+    mins = (mins + 1440) % 1440;
+    let h = Math.floor(mins / 60);
+    const m = mins % 60;
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    if (h === 0) h = 12;
+    return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
+  }
+
+  function calculate(shower) {
+    const drive = Number(document.getElementById('driveMinutes').value);
+    const arrival = document.getElementById('arrivalTime').value;
+
+    if (!arrival || isNaN(drive)) return;
+
+    const BASE_NO_SHOWER = 35;
+    const BASE_WITH_SHOWER = 50;
+
+    const prepTime = shower ? BASE_WITH_SHOWER : BASE_NO_SHOWER;
+
+    const arrivalMins = timeToMinutes(arrival);
+    const leaveTime = arrivalMins - drive;
+    const startTime = leaveTime - prepTime;
+
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('resultStep').classList.add('active');
+
+    document.getElementById('output').innerHTML = `
+      Start getting ready by: ${minutesTo12Hour(startTime)}<br>
+      Leave the house by: ${minutesTo12Hour(leaveTime)}<br><br>
+      Prep time: ${prepTime} minutes<br>
+      Drive time: ${drive} minutes
+    `;
+  }
+</script>
+
+</body>
+</html>
