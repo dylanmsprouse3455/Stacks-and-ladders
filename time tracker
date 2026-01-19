@@ -108,7 +108,7 @@
 
     document.getElementById('output').innerHTML = `
       Start getting ready by: ${minutesTo12Hour(startTime)}<br>
-      Leave the house by: ${minutesTo12Hour(leaveTime)}<br><br>
+      Leave the house by: ${minutesTo12Hour(leaveTime)}<br> <br>
       Prep time: ${prepTime} minutes<br>
       Drive time: ${drive} minutes
     `;
